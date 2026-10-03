@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SMARTMEET - Common Meeting Time Finder</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                SM
+            </div>
+
+            <div>
+                <h1>SMARTMEET</h1>
+                <p>Common Meeting Time Finder</p>
+            </div>
+
+        </div>
+
+        <div class="header-badge">
+            DAA Project
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="container">
+
+        <!-- HERO -->
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <span class="hero-label">
+                    ALGORITHM POWERED
+                </span>
+
+                <h2>
+                    Find the perfect time
+                    <br>
+                    for everyone.
+                </h2>
+
+                <p>
+                    SMARTMEET uses a sweep-line algorithm to
+                    find common available meeting times across
+                    multiple participant schedules.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SETTINGS
+        ================================================== -->
+
+        <section class="panel">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>Meeting Settings</h2>
+
+                    <p>
+                        Define your working hours and required
+                        meeting duration.
+                    </p>
+                </div>
+
+                <button
+                    id="resetBtn"
+                    class="secondary-btn"
+                    type="button"
+                >
+                    Reset
+                </button>
+
+            </div>
+
+
+            <div class="settings-grid">
+
+                <div class="input-group">
+
+                    <label for="workStart">
+                        Working Start
+                    </label>
+
+                    <input
+                        id="workStart"
+                        type="time"
+                        value="09:00"
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="workEnd">
+                        Working End
+                    </label>
+
+                    <input
+                        id="workEnd"
+                        type="time"
+                        value="17:00"
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="duration">
+                        Meeting Duration
+                    </label>
+
+                    <input
+                        id="duration"
+                        type="number"
+                        value="30"
+                        min="1"
+                        step="1"
+                    >
+
+                    <span class="input-hint">
+                        minutes
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ADD SCHEDULE
+        ================================================== -->
+
+        <section class="panel">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>Add Participant Schedule</h2>
+
+                    <p>
+                        Enter a participant and their busy
+                        time period.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="schedule-form">
+
+                <div class="input-group">
+
+                    <label for="participant">
+                        Participant Name
+                    </label>
+
+                    <input
+                        id="participant"
+                        type="text"
+                        placeholder="e.g. Alice"
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="busyStart">
+                        Busy Start
+                    </label>
+
+                    <input
+                        id="busyStart"
+                        type="time"
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="busyEnd">
+                        Busy End
+                    </label>
+
+                    <input
+                        id="busyEnd"
+                        type="time"
+                    >
+
+                </div>
+
+
+                <div class="form-button">
+
+                    <button
+                        id="addBtn"
+                        class="primary-btn"
+                        type="button"
+                    >
+                        + Add Schedule
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="quick-actions">
+
+                <button
+                    id="demoBtn"
+                    class="secondary-btn"
+                    type="button"
+                >
+                    Load Demo Data
+                </button>
+
+                <button
+                    id="clearBtn"
+                    class="danger-btn"
+                    type="button"
+                >
+                    Clear All
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PARTICIPANT SCHEDULES
+        ================================================== -->
+
+        <section class="panel">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>Participant Schedules</h2>
+
+                    <p>
+                        Current busy periods for all
+                        participants.
+                    </p>
+                </div>
+
+                <div class="stats">
+
+                    <div class="stat">
+
+                        <strong id="participantCount">
+                            0
+                        </strong>
+
+                        <span>
+                            Participants
+                        </span>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <strong id="scheduleCount">
+                            0 schedules
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Participant
+                            </th>
+
+                            <th>
+                                Busy Start
+                            </th>
+
+                            <th>
+                                Busy End
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="scheduleBody">
+
+                        <tr class="empty-row">
+
+                            <td colspan="4">
+                                Add schedules or load demo data.
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FIND BUTTON
+        ================================================== -->
+
+        <section class="action-section">
+
+            <button
+                id="findBtn"
+                class="find-btn"
+                type="button"
+            >
+                Find Common Time
+            </button>
+
+            <p>
+                The DAA sweep-line algorithm will analyze
+                all schedules.
+            </p>
+
+        </section>
+
+
+        <!-- =================================================
+             RESULTS
+        ================================================== -->
+
+        <section class="panel results-panel">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="hero-label">
+                        RESULTS
+                    </span>
+
+                    <h2>
+                        Common Available Times
+                    </h2>
+
+                    <p>
+                        Time periods when all participants
+                        are available.
+                    </p>
+
+                </div>
+
+
+                <div class="result-stats">
+
+                    <div class="result-stat">
+
+                        <strong id="commonCount">
+                            0
+                        </strong>
+
+                        <span>
+                            Common Windows
+                        </span>
+
+                    </div>
+
+
+                    <div class="result-stat">
+
+                        <strong id="slotCount">
+                            0
+                        </strong>
+
+                        <span>
+                            Meeting Slots
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="commonGrid"
+                class="results-grid"
+            >
+
+                <div class="result-placeholder">
+
+                    Run the algorithm to see
+                    common availability.
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             MEETING SLOTS
+        ================================================== -->
+
+        <section class="panel">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Possible Meeting Slots
+                    </h2>
+
+                    <p>
+                        Select a slot for your meeting.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="slotsGrid"
+                class="slots-grid"
+            >
+
+                <div class="result-placeholder">
+
+                    Your meeting slots will
+                    appear here.
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="selectedSlot"
+                class="selected-slot"
+            >
+                No meeting slot selected
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer>
+
+        <p>
+            SMARTMEET &nbsp;•&nbsp;
+            DAA Common Meeting Time Finder
+        </p>
+
+        <p>
+            Sweep-Line Algorithm
+        </p>
+
+    </footer>
+
+
+    <!-- =====================================================
+         TOAST
+    ====================================================== -->
+
+    <div
+        id="toast"
+        class="toast"
+    ></div>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script
+        src="{{ url_for('static', filename='app.js') }}"
+    ></script>
+
+</body>
+
+</html>
